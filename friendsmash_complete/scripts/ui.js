@@ -309,7 +309,7 @@ function sendChallenge() {
   else {
     FB.ui({method: 'apprequests',
       title: 'Play Friend Smash with me!',
-      message: 'Been having a smashing time playing Friend Smash, come check it out.',
+      message: 'Friend Smash is smashing! Check it out.',
     }, fbCallback);
   }
 }

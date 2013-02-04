@@ -282,7 +282,4 @@ function startGame(fbid, name) {
     displayMenu(false, true);
 }
 
-function fbCallback(response) {
-  console.log(response);
-}
 

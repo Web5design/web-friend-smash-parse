@@ -108,11 +108,6 @@ function initGame(challenge_fbid, challenge_name) {
   if (challenge_fbid == null)
   {
       if (g_useFacebook) {
-        FB.api('/me/friends?fields=id,first_name', function(response) {
-          var randomFriend = Math.floor(getRandom(0, response.data.length));
-          gFriendID = response.data[randomFriend].id;
-          gSmashUIText.innerHTML = "Smash " + response.data[randomFriend].first_name + " !";
-        });
       } else {
           var nCelebToSpawn = Math.floor(getRandom(0, 10));
           gFriendID = nCelebToSpawn;
