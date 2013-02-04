@@ -1,0 +1,225 @@
+/**
+* Copyright 2013 Facebook, Inc.
+*
+* You are hereby granted a non-exclusive, worldwide, royalty-free license to
+* use, copy, modify, and distribute this software in source code or binary
+* form for use in connection with the web services and APIs provided by
+* Facebook.
+*
+* As with any software that integrates with the Facebook platform, your use
+* of this software is subject to the Facebook Developer Principles and
+* Policies [http://developers.facebook.com/policy/]. This copyright notice
+* shall be included in all copies or substantial portions of the software.
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+* THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+* FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+* DEALINGS IN THE SOFTWARE.
+*/
+
+* {
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);	
+}
+
+body {
+  margin: 0px; 
+  background-color: #000;
+  background-image: url("../images/pagebg.jpg");
+}
+
+#topbar {
+  background-image: url("../images/topbar_repeater.jpg");
+  background-repeat: repeat-x;
+  height: 73px;
+  width: 100%;
+}
+
+
+#stage {
+  position: relative;
+  margin: 0px auto;
+  margin-top:30px;
+  background-image: url("../images/bg.jpg");
+  border: 1px solid #e44a26;
+}
+
+#gameboard {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+}
+
+
+.menu_item  {
+  cursor: pointer;
+  position: absolute;
+}
+
+#menu_container {
+  position: absolute;
+}
+
+#welcome_msg_container {
+  background-image: url("../images/panel_welcome.png");
+  position:absolute;
+  left:0px;
+  top:10px;
+  width: 458px;
+  height: 170px;
+}
+
+#welcome_msg {
+  color: #ebebeb;
+  padding-top: 16px;
+  padding-left: 170px;
+  font: 28pt "Arial Narrow", Arial, sans-serif;
+  position: absolute;
+}
+
+#welcome_submsg {
+  color: #aaa;
+  padding-top: 58px;
+  padding-left: 170px;
+  font: 20pt "Arial Narrow", Arial, sans-serif;
+  position: absolute;
+}
+
+#welcome_img {
+  padding-top: 11px;
+  padding-left: 9px;
+  position: absolute;
+}
+
+#ingame_scoreText {
+  color: #ccc;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font: 20pt "Arial Narrow", Arial, sans-serif;
+}
+
+#ingame_smashText {
+  color: #e44a26;
+  position: absolute;
+  top: 10px;
+  left: 20px;
+  font: 26pt "Arial Narrow", Arial, sans-serif;
+  text-shadow: 2px 2px #000000;
+}
+
+#ingame_life0 {
+  position: absolute;
+  top: 50px;
+  left: 16px;
+  width: 64px;
+  height: 64px;
+  background-image: url("../images/heart.png"); 
+}
+
+#ingame_life1 {
+  position: absolute;
+  top: 50px;
+  left: 86px;
+  width: 64px;
+  height: 64px;
+  background-image: url("../images/heart.png"); 
+}
+
+#ingame_life2 {
+  position: absolute;
+  top: 50px;
+  left: 156px;
+  width: 64px;
+  height: 64px;
+  background-image: url("../images/heart.png"); 
+}
+
+#scoreboard_container {
+  max-height: 550px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  float: right;
+  width: 452px;
+  padding-top: 20px;
+  position: relative;
+  right: -4px;
+}
+
+.scoreboard_tournament_stub {
+  background-image: url("../images/scoreboardentry_tournament.png");
+  width: 450px;
+  height: 112px;
+  right: 0;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.scoreboard_tournament_stub_time {
+  font: 18pt "Arial Narrow", Arial, sans-serif;
+  color: #262626;
+  text-align: center;
+  left: 120px;
+  top: 90px;
+  width: 310px;
+  position: absolute;
+}
+
+.scoreboard_stub {
+  background-image: url("../images/scoreboardentry_right.png");
+  width: 450px;
+  height: 112px;
+  right: 0;
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.scoreboard_stub_rank {
+  font: 60pt "Arial Narrow", Arial, sans-serif;
+  color: #262626;
+  position: relative;
+  top: 10px;
+  left: 30px;
+  text-align: left;
+}
+
+.scoreboard_stub_name {
+  font: 26pt "Arial Narrow", Arial, sans-serif;
+  color: #ebebeb;
+  text-align: left;
+  left: 216px;
+  top: -88px;
+  position: relative;
+}
+
+.scoreboard_stub_score {
+  font: 20pt "Arial Narrow", Arial, sans-serif;
+  color: #ebebeb;
+  text-align: left;
+  left: 216px;
+  top: -90px;
+  position: relative;
+}
+
+.scoreboard_stub_challengebutton {
+  left: 280px;
+  top: -158px;
+  width: 52px;
+  height: 96px;
+  position: relative;
+}
+
+.scoreboard_stub_image {
+  left: 106px;
+  top: -155px;
+  width: 97px;
+  position: relative;
+}
+
+#menu_shim {
+  position: absolute;
+}
+
+
