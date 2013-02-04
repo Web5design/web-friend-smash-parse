@@ -129,7 +129,7 @@ function showScores() {
 
   console.log("Fetching tournament info from server");
 
-  $.getJSON(g_api_url + "tournament",
+  $.getJSON(g_api_url + "/tournament",
   function(data) {
     
     
@@ -171,7 +171,7 @@ function showScores() {
 
   console.log("Fetching scores from server");
 
-  $.get(g_api_url + "scores", { fbid: gPlayerFBID, access_token: FB.getAuthResponse()['accessToken']},
+  $.get(g_api_url + "/scores", { fbid: gPlayerFBID, access_token: FB.getAuthResponse()['accessToken']},
   function(data) {
       
       console.log("Got scores data from server");
