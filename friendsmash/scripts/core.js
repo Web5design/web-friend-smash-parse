@@ -20,7 +20,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-var g_useFacebook = true;
+var g_useFacebook = false;
 
 var g_api_url = "https://immense-hamlet-8089.herokuapp.com";
 var g_init = false;
