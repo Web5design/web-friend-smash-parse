@@ -112,10 +112,6 @@ function createMenu() {
   }
 }
 
-function processIncomingURL() {
-  return false;
-}
-
 function showScores() {
   
   var scoreboardContainer = document.createElement('div');
