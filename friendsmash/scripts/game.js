@@ -303,7 +303,6 @@ function endGame() {
   var welcomeSubMsg = document.getElementById('welcome_submsg');
   welcomeSubMsg.innerHTML = 'You scored ' + gScore + ' !';
 
-  sendOG();
   sendScore();
   displayMenu(true);
 }
