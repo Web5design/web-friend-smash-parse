@@ -34,6 +34,6 @@
   "tutorial": {
     "url": "https://developers.facebook.com/docs/tutorials/canvas-games/"
   },
-  "featured": true,
-  "deprecated": false
+  "featured": 1,
+  "deprecated": 0
 }
