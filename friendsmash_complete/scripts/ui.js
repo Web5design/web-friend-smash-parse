@@ -300,100 +300,6 @@ function showScores() {
   var scoreboardTournamentStub = document.createElement('div');
   scoreboardTournamentStub.className = 'scoreboard_tournament_stub';
   scoreboardContainer.appendChild(scoreboardTournamentStub);  
-
-  if (g_use_server)
-  {
-    console.log("Fetching tournament info from server");
-
-      $.getJSON(g_api_url + "/tournament",
-      function(data) {
-        
-        
-        var tournamentEndDate = data['end_date'];
-        tournamentEndDate = tournamentEndDate.replace(/:| /g,"-");
-        var YMDhms = tournamentEndDate.split("-");
-        var tournamentEndDateSQL = new Date();
-        tournamentEndDateSQL.setFullYear(parseInt(YMDhms[0]), parseInt(YMDhms[1])-1,
-                                                 parseInt(YMDhms[2]));
-        tournamentEndDateSQL.setHours(parseInt(YMDhms[3]), parseInt(YMDhms[4]), 
-                                              parseInt(YMDhms[5]), 0/*msValue*/);
-
-
-        var scoreboardTournamentStubTime = document.createElement('div');
-        scoreboardTournamentStubTime.className = 'scoreboard_tournament_stub_time';
-        scoreboardContainer.appendChild(scoreboardTournamentStubTime);
-
-        this.gTournamentCountdown = setInterval(function(){
-
-          function pad2(number) {
-            return (number < 10 ? '0' : '') + number
-          }
-
-          var currentDate = new Date();
-          var delta = Math.abs(currentDate-tournamentEndDateSQL);
-          delta /= 1000;
-          var daysRemaining = Math.floor(delta / 86400);
-          var hoursRemaining = Math.floor((delta % 86400) / 3600);
-          var minutesRemaining = Math.floor(((delta % 86400) % 3600) / 60);
-          var secondsRemaining = Math.floor(((delta % 86400) % 3600) % 60);
-          var timeRemaining = daysRemaining + " Days " + pad2(hoursRemaining) + " Hrs " + pad2(minutesRemaining) + " Mins " + pad2(secondsRemaining) + " Secs";
-
-          scoreboardTournamentStubTime.innerHTML = timeRemaining
-
-        }, 1000);
-      });
-
-      console.log("Fetching scores from server");
-
-      $.get(g_api_url + "/scores", { fbid: gPlayerFBID, access_token: FB.getAuthResponse()['accessToken']},
-      function(data) {
-          
-          console.log("Got scores data from server");
-          console.log(data);
-
-          for (var i=0; i<data.length; i++) 
-          {
-            var scoreboardStub = document.createElement('div');
-            scoreboardStub.className = 'scoreboard_stub';
-            scoreboardContainer.appendChild(scoreboardStub);
-
-            var scoreboardStubRank = document.createElement('div');
-            scoreboardStubRank.className = 'scoreboard_stub_rank';
-            scoreboardStubRank.innerHTML = (i+1) + ".";
-            scoreboardStub.appendChild(scoreboardStubRank);
-
-            var scoreboardStubName = document.createElement('div');
-            scoreboardStubName.className = 'scoreboard_stub_name';
-            scoreboardStubName.innerHTML = data[i].first_name;
-            scoreboardStub.appendChild(scoreboardStubName);
-
-            var scoreboardStubScore = document.createElement('div');
-            scoreboardStubScore.className = 'scoreboard_stub_score';
-            scoreboardStubScore.innerHTML = "Score: " + data[i].highscore;
-            scoreboardStub.appendChild(scoreboardStubScore);
-
-            var scoreboardStubImage = document.createElement('img');
-            scoreboardStubImage.setAttribute('src', "https://graph.facebook.com/" + data[i].fbid + "/picture?width=128&height=128");
-            scoreboardStubImage.className = 'scoreboard_stub_image';
-            scoreboardStub.appendChild(scoreboardStubImage);
-
-            var scoreboardStubChallengeButton = document.createElement('img');
-            scoreboardStubChallengeButton.setAttribute('src', "/images/button_scoreboardchallenge.png");
-            scoreboardStubChallengeButton.className = 'scoreboard_stub_challengebutton';
-            
-            scoreboardStubChallengeButton.onclick = (function() {
-              var fbid = data[i].fbid;
-              var first_name = data[i].first_name;
-              return function() {
-                startGame(fbid, first_name);
-              } 
-            })();
-
-            scoreboardStub.appendChild(scoreboardStubChallengeButton);
-              
-          }
-      });
-  }
 }
 
 function sendChallenge() {
@@ -440,15 +346,6 @@ function sendScore() {
     FB.api('/me/scores/', 'post', { score: gScore }, function(response) {
       console.log("Score posted to Facebook");
     });
-
-    if (g_use_server) {
-      console.log("Posting score to server");
-
-      $.post(g_api_url + "/scores", { fbid: gPlayerFBID, score: gScore },
-      function(data) {
-        console.log("Response from server:" + data);
-      });
-    } 
   }
 }
 

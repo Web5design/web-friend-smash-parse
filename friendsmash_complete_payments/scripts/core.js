@@ -21,8 +21,7 @@
 */
 
 var g_useFacebook = true;
-var g_api_url     = "https://ancient-savannah-6416.herokuapp.com";
-var g_use_server  = false;
+var g_api_url     = "https://immense-hamlet-8089.herokuapp.com";
 var g_init        = false;
 var stage;
 
