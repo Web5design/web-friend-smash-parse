@@ -133,7 +133,36 @@ function createMenu() {
       function() {
         $(this).stop().animate({"opacity": "1"}, "slow");
       }
-    ); 
+    );
+    
+    /* Store Button */
+    var storeButton = document.createElement('div');
+    storeButton.className = 'menu_item';
+    storeButton.id = 'store_button';
+    storeButton.style.top = "479px";
+    storeButton.style.left = "0px";
+    storeButton.style.zIndex = "10";
+    storeButton.setAttribute('onclick', 'javascript:showStore()');
+    storeButton.style.backgroundImage = "url('images/button_store.png')";
+    menuContainer.appendChild(storeButton);
+
+    var storeButtonHover = document.createElement('div');
+    storeButtonHover.className = 'menu_item';
+    storeButtonHover.id = 'store_button_hover';
+    storeButtonHover.style.top = "479px";
+    storeButtonHover.style.left = "0px";
+    storeButtonHover.style.backgroundImage = "url('images/button_store_hot.png')";
+    menuContainer.appendChild(storeButtonHover);
+
+    $("#store_button").hover (
+      function() {
+        $(this).stop().animate({"opacity": "0"}, "slow");
+      },
+      function() {
+        $(this).stop().animate({"opacity": "1"}, "slow");
+      }
+    );
+  
 
     FB.getLoginStatus(function(response) {
           if (response.status === 'connected') {
@@ -534,3 +563,80 @@ function fbCallback(response) {
   console.log(response);
 }
 
+function showStore() {
+   var background = document.createElement('div');
+   background.id         = 'modal_background';
+   stage.appendChild(background);
+
+   var storeContainer = document.createElement('div');
+   storeContainer.id      = 'store';
+   stage.appendChild(storeContainer);
+   
+   var closeStoreButton = document.createElement('div');
+   closeStoreButton.id    = 'close_button';
+   closeStoreButton.setAttribute('onclick', 'javascript:closeStore()');
+   stage.appendChild(closeStoreButton);
+   
+   buildStore();
+
+   $(background).animate({'opacity': 1}, 'fast');
+   $(storeContainer).animate({'opacity': 1}, 'normal');
+   $(closeStoreButton).animate({'opacity': 1}, 'normal');
+}
+
+function closeStore() {
+  $('#store').animate({'opacity': 0}, 'fast', function(){this.remove()});
+  $('#close_button').animate({'opacity': 0}, 'fast', function(){this.remove()});
+  $('#modal_background').animate({'opacity': 0, }, 'normal', function(){this.remove()});
+}
+
+function showPopUp(options) {
+  options       = options || {};
+  var img_src   = options.img || false;
+  var titleMsg  = options.title || "";
+  var callback  = options.callback || null; 
+  
+  var background = document.createElement('div');
+  background.id         = 'modal_background';
+  stage.appendChild(background);
+  
+  var container = document.createElement('div');
+  container.id      = 'pop_up';
+  stage.appendChild(container);
+  
+  var closeButton = document.createElement('div');
+  closeButton.id    = 'close_button';
+  closeButton.setAttribute('onclick', 'javascript:closePopUp('+callback+')');
+  stage.appendChild(closeButton);
+  
+  var header = document.createElement('div');
+  container.appendChild(header);
+  
+  if(img_src) {
+    var image = document.createElement('img');
+    image.setAttribute('src', 'images/'+img_src);
+    header.appendChild(image);
+  }
+  
+  var title = document.createElement('h1');
+  title.innerHTML  = titleMsg;
+  header.appendChild(title);
+  
+  var content = document.createElement('div');
+  content.style.position  = 'absolute';
+  content.style.top       = '75px';
+  content.style.width     = '100%';
+  container.appendChild(content);
+  
+  $(background).animate({'opacity': 1}, 'fast');
+  $(container).animate({'opacity': 1}, 'normal');
+  $(closeButton).animate({'opacity': 1}, 'normal');
+  
+  return content;
+}
+
+function closePopUp(callback) {
+  $('#modal_background').animate({'opacity': 0}, 'normal', function(){this.remove(); if(callback) callback();});
+  $('#pop_up').animate({'opacity': 0}, 'fast', function(){this.remove()});
+  $('#close_button').animate({'opacity': 0}, 'fast', function(){this.remove()});
+}
