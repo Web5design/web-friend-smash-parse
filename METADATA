@@ -11,7 +11,7 @@
     },
     {
       "name": "php"
-    }
+    },
     {
       "name": "javascript"
     }
@@ -28,12 +28,12 @@
   ],
   "screenshots": [
     {
-      "url": "screenshots/friendsmash_1.png"
+      "path": "screenshots/friendsmash_1.png"
     }
   ],
   "tutorial": {
     "url": "https://developers.facebook.com/docs/tutorials/canvas-games/"
   },
-  "featured": false,
-  "deprecated": false
+  "featured": 1,
+  "deprecated": 0
 }
