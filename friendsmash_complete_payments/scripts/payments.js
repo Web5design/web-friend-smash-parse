@@ -345,7 +345,7 @@ function showMobile() {
     while ($('.store_package').length < 5 && x < gUserPricePoints.pricepoints.length) {
       
       var quantity  = Math.round(parseFloat(gUserPricePoints.pricepoints[x].payout_base_amount)*gUserCurrency.usd_exchange*10);
-      if (quantity <= 0) continue;
+      if (quantity <= 0) {x++; continue;}
       
       var price     = gUserPricePoints.pricepoints[x].payer_amount;
       var currency  = gUserPricePoints.pricepoints[x].currency;
