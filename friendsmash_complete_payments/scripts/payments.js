@@ -6,6 +6,11 @@ var gSupportedCurrencies = {};
 // Replace this with your own object id
 var gCoinsObjectId = 470134983067927;
 
+var gUserCountryPricePoints       = {};
+gUserCountryPricePoints.count     = 0;
+gUserCountryPricePoints.default   = "US";
+gUserCountryPricePoints.countries = [];
+
 gSupportedCurrencies["USD"] = {symbol: "&#36;",    pre: true};
 gSupportedCurrencies["SGD"] = {symbol: "S&#36;",   pre: true};
 gSupportedCurrencies["RON"] = {symbol: "LEU",      pre: false};
@@ -170,6 +175,7 @@ function buildStore() {
 }
 
 function showProducts() {
+
   $('.store_button').removeClass('selected');
   $('#products_button').addClass('selected');
   
@@ -245,6 +251,7 @@ function showProducts() {
 }
 
 function showCoinPackages() {
+
   $('.store_button').removeClass('selected');
   $('#coins_button').addClass('selected');
   
@@ -370,6 +377,56 @@ function showMobile() {
   }
 }
 
+function updatePricePointsCountry() {
+  
+  var pricepoints;
+  
+  if ($("#country_selector").length > 0) {
+    pricepoints = gUserCountryPricePoints.countries[$("#country_selector")[0].value];
+  }
+  else pricepoints = gUserCountryPricePoints.countries[gUserCountryPricePoints.default];
+  
+  var storeContents = $('#store_contents')[0];
+  
+  $(".store_package").remove();
+  
+  for (var x in pricepoints) {
+    if (typeof(pricepoints[x]) == "function") continue;
+    
+    var price     = pricepoints[x].payer_amount;
+    var currency  = pricepoints[x].currency;
+    var quantity;
+    
+    if (gSupportedCurrencies[currency].price) {
+       unit = gSupportedCurrencies[currency].price;
+       quantity = Math.round(pricepoints[x].payout_base_amount/unit);
+    }
+    else {
+      unit = parseInt(gSupportedCurrencies["USD"].price*gUserCurrency.usd_exchange_inverse*100)/100;
+      quantity = Math.round(pricepoints[x].payout_base_amount/unit);
+    }
+    if (quantity <= 0) quantity = 1;
+    
+    var buy_coins = document.createElement('div');
+    buy_coins.className = "store_package";
+    buy_coins.innerHTML = "<img src='images/coin_bundle_icon.png'/>";
+    buy_coins.innerHTML += "<h3 class='quantity'>"+quantity+" coins</h3>";
+    buy_coins.innerHTML += "<span></span>";
+    
+    if (gSupportedCurrencies[currency].pre) {
+      buy_coins.innerHTML += "<h3>" + gSupportedCurrencies[currency].symbol + price + "</h3>";
+    }
+    else {
+      buy_coins.innerHTML += "<h3>" + price + gSupportedCurrencies[currency].symbol + "</h3>";
+    }
+    
+    buy_coins.innerHTML += "<div class='button_small'>Buy!</div>";
+    buy_coins.setAttribute("onClick","javascript:buyCoinsMobile("+x+")");
+    storeContents.appendChild(buy_coins);
+
+  }
+}
+
 function getUserCurrency(callback) {
   FB.api('/me/?fields=currency', function(data) {
       if (!data || data.error) {
@@ -415,6 +472,26 @@ function getUserPricePoints(callback) {
       } else {
           console.log(data);
           gUserPricePoints = data.payment_mobile_pricepoints;
+          
+          //GET DIFFERENT COUNTRIES PRICEPOINTS
+          for (var i in gUserPricePoints.pricepoints) {
+            var pricepoint = gUserPricePoints.pricepoints[i];
+            if (typeof(pricepoint) == "function") continue;
+            
+            if (!gUserCountryPricePoints.countries[pricepoint.country]) {
+              gUserCountryPricePoints.countries[pricepoint.country] = [];
+              gUserCountryPricePoints.count++;
+            }
+            
+            gUserCountryPricePoints.countries[pricepoint.country].push(pricepoint);
+          }
+          
+          if (gUserPricePoints.predicted_mobile_country) 
+            gUserCountryPricePoints.default = gUserPricePoints.predicted_mobile_country
+          else gUserCountryPricePoints.default = gUserPricePoints.pricepoints[0].country;
+          
+          console.log(gUserCountryPricePoints);
+          
           if (callback) callback();
       }
   });
@@ -460,20 +537,26 @@ function buyCoins(quantity) {
 }
 
 function buyCoinsMobile(pricepointNumber) {
-  var pricepoint = gUserPricePoints.pricepoints[pricepointNumber];
+  var pricepoints;
   
-  console.log(pricepoint);
+  if ($("#country_selector").length > 0) {
+    pricepoints = gUserCountryPricePoints.countries[$("#country_selector")[0].value];
+  }
+  else pricepoints = gUserCountryPricePoints.countries[gUserCountryPricePoints.default];
+  
+  var current_pricepoint = pricepoints[pricepointNumber];
   var requestID = hash(64);
+  
   console.log("Constructing Request ID: " + requestID);
   
-  var quantity  = Math.round(parseFloat(pricepoint.payout_base_amount)*gUserCurrency.usd_exchange*10);
+  var quantity  = Math.round(parseFloat(current_pricepoint.payout_base_amount)*gUserCurrency.usd_exchange*10);  
   
   FB.ui({
       method: 'pay',
       action: 'purchaseitem',
       product: g_api_url+'/opengraph/coin.html',
       request_id: requestID,
-      pricepoint_id: pricepoint.pricepoint_id,
+      pricepoint_id: current_pricepoint.pricepoint_id,
       quantity: quantity,
       quantity_min: 1,
       quantity_max: 500
@@ -487,15 +570,22 @@ function verifyPayment(data) {
     alert("There was an error processing your payment. Please try again!");
     return;
   }
-
+  
   console.log("Payment verification complete");
   console.log(data);
+  
+  if(data.error_code) {
+    if(data.error_code != 1383010) {
+      alert("There was an error processing your payment."+data.error_message+" Error code:"+data.error_code);
+    }
+    return;
+  }
 
   closeStore();
   gPlayerCoins = parseInt(gPlayerCoins) + parseInt(data.quantity);
         
   var success = showPopUp({img:'coin_bundle64.png', title:'Coins!'});
-  success.innerHTML = "You bought "+data.quantity+" coins!<br>Let's smash some friends!";
+  success.innerHTML = "You bought " + data.quantity + " coins!<br>Let's smash some friends!";
 
   $('.player_coins').html(gPlayerCoins);
 }

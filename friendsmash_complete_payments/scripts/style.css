@@ -393,6 +393,14 @@ body {
   position: absolute;
   top: 155px;
   width: 100%;
+  height: 350px;
+  overflow-y: scroll;
+  overflow-x: hidden;
+}
+
+#store_contents h3, #store_contents select {
+  display:inline;
+  font-size: 25px;
 }
 
 

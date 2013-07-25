@@ -482,9 +482,9 @@ function showStore() {
 }
 
 function closeStore() {
-  $('#store').animate({'opacity': 0}, 'fast', function(){this.remove()});
-  $('#close_button').animate({'opacity': 0}, 'fast', function(){this.remove()});
-  $('#modal_background').animate({'opacity': 0, }, 'normal', function(){this.remove()});
+  $('#store').animate({'opacity': 0}, 'fast', function(){$('#store').remove()});
+  $('#close_button').animate({'opacity': 0}, 'fast', function(){$('#close_button').remove()});
+  $('#modal_background').animate({'opacity': 0, }, 'normal', function(){$('#modal_background').remove()});
 }
 
 function showPopUp(options) {
@@ -533,7 +533,7 @@ function showPopUp(options) {
 }
 
 function closePopUp(callback) {
-  $('#modal_background').animate({'opacity': 0}, 'normal', function(){this.remove(); if(callback) callback();});
-  $('#pop_up').animate({'opacity': 0}, 'fast', function(){this.remove()});
-  $('#close_button').animate({'opacity': 0}, 'fast', function(){this.remove()});
+  $('#modal_background').animate({'opacity': 0}, 'normal', function(){ $('#modal_background').remove(); if(callback) callback();});
+  $('#pop_up').animate({'opacity': 0}, 'fast', function(){ $('#pop_up').remove()});
+  $('#close_button').animate({'opacity': 0}, 'fast', function(){ $('#close_button').remove()} );
 }
