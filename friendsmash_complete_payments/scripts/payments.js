@@ -322,6 +322,7 @@ function showCoinPackages() {
 }
 
 function showMobile() {
+
   $('.store_button').removeClass('selected');
   $('#coins_button').addClass('selected');
   
@@ -347,45 +348,34 @@ function showMobile() {
     title.style.marginBottom = '10px';
     
     storeContents.appendChild(title);
-    var x = 0;
     
-    while ($('.store_package').length < 5 && x < gUserPricePoints.pricepoints.length) {
-      
-      var quantity  = Math.round(parseFloat(gUserPricePoints.pricepoints[x].payout_base_amount)*gUserCurrency.usd_exchange*10);
-      if (quantity <= 0) {x++; continue;}
-      
-      var price     = gUserPricePoints.pricepoints[x].payer_amount;
-      var currency  = gUserPricePoints.pricepoints[x].currency;
-      
-      var buy_coins = document.createElement('div');
-      buy_coins.className = "store_package";
-      buy_coins.innerHTML = "<img src='images/coin_bundle_icon.png'/>";
-      buy_coins.innerHTML += "<h3 class='quantity'>"+quantity+" coins</h3>";
-      buy_coins.innerHTML += "<span></span>";
-      
-      if (gSupportedCurrencies[currency].pre) {
-        buy_coins.innerHTML += "<h3>" + gSupportedCurrencies[currency].symbol + price + "</h3>";
-      }
-      else buy_coins.innerHTML += "<h3>" + price + gSupportedCurrencies[currency].symbol + "</h3>";
-      
-      buy_coins.innerHTML += "<div class='button_small'>Buy!</div>";
-      buy_coins.setAttribute("onClick","javascript:buyCoinsMobile("+x+")");
-      storeContents.appendChild(buy_coins);
-      
-      x++;
+    var country_selector = document.createElement('select');
+    country_selector.id = "country_selector";
+    country_selector.style.width = "90px";
+    
+    for (var country_id in gUserCountryPricePoints.countries) {
+      if (typeof(gUserCountryPricePoints.countries[country_id]) == "function") continue;
+      var country_option = document.createElement("option");
+      country_option.value = country_id;
+      country_option.innerHTML = capitalize(COUNTRY_CODES[country_id]);
+      country_selector.appendChild(country_option);
     }
+    
+    var select_text = document.createElement("h3");
+    select_text.innerHTML = "Select your country:  ";
+    
+    storeContents.appendChild(select_text);
+    storeContents.appendChild(country_selector);
+    
+    $("select").change(updatePricePointsCountry);
+    $("#country_selector").val(gUserCountryPricePoints.default);
+    updatePricePointsCountry();
   }
 }
 
 function updatePricePointsCountry() {
   
-  var pricepoints;
-  
-  if ($("#country_selector").length > 0) {
-    pricepoints = gUserCountryPricePoints.countries[$("#country_selector")[0].value];
-  }
-  else pricepoints = gUserCountryPricePoints.countries[gUserCountryPricePoints.default];
-  
+  var pricepoints   = gUserCountryPricePoints.countries[$("#country_selector")[0].value];
   var storeContents = $('#store_contents')[0];
   
   $(".store_package").remove();
@@ -395,16 +385,16 @@ function updatePricePointsCountry() {
     
     var price     = pricepoints[x].payer_amount;
     var currency  = pricepoints[x].currency;
-    var quantity;
+    var unit;
     
     if (gSupportedCurrencies[currency].price) {
-       unit = gSupportedCurrencies[currency].price;
-       quantity = Math.round(pricepoints[x].payout_base_amount/unit);
+      unit = gSupportedCurrencies[currency].price;     
     }
     else {
       unit = parseInt(gSupportedCurrencies["USD"].price*gUserCurrency.usd_exchange_inverse*100)/100;
-      quantity = Math.round(pricepoints[x].payout_base_amount/unit);
     }
+    
+    var quantity = Math.round(pricepoints[x].payout_base_amount/unit);
     if (quantity <= 0) quantity = 1;
     
     var buy_coins = document.createElement('div');
@@ -437,13 +427,6 @@ function getUserCurrency(callback) {
           console.log(data);
           gUserCurrency = data.currency;
 
-          //gUserCurrency.currency_exchange = 2.7450423;
-          //gUserCurrency.currency_exchange_inverse = 0.3642931113;
-          //gUserCurrency.currency_offset = 100;
-          //gUserCurrency.usd_exchange = 0.27450423;
-          //gUserCurrency.usd_exchange_inverse = 3.6429311126;
-          //gUserCurrency.user_currency = "ILS";
-
           if (callback) callback();
       }
   });
@@ -470,7 +453,7 @@ function getUserPricePoints(callback) {
           console.error("ERROR GETTING USER PRICEPOINTS");
           console.log(data);
       } else {
-          console.log(data);
+
           gUserPricePoints = data.payment_mobile_pricepoints;
           
           //GET DIFFERENT COUNTRIES PRICEPOINTS
@@ -489,8 +472,6 @@ function getUserPricePoints(callback) {
           if (gUserPricePoints.predicted_mobile_country) 
             gUserCountryPricePoints.default = gUserPricePoints.predicted_mobile_country
           else gUserCountryPricePoints.default = gUserPricePoints.pricepoints[0].country;
-          
-          console.log(gUserCountryPricePoints);
           
           if (callback) callback();
       }
@@ -545,11 +526,21 @@ function buyCoinsMobile(pricepointNumber) {
   else pricepoints = gUserCountryPricePoints.countries[gUserCountryPricePoints.default];
   
   var current_pricepoint = pricepoints[pricepointNumber];
-  var requestID = hash(64);
+  var currency  = current_pricepoint.currency;
+  var unit;
   
+  var requestID = hash(64);
   console.log("Constructing Request ID: " + requestID);
   
-  var quantity  = Math.round(parseFloat(current_pricepoint.payout_base_amount)*gUserCurrency.usd_exchange*10);  
+  if (gSupportedCurrencies[currency].price) {
+    unit = gSupportedCurrencies[currency].price;     
+  }
+  else {
+    unit = parseInt(gSupportedCurrencies["USD"].price*gUserCurrency.usd_exchange_inverse*100)/100;
+  }
+  
+  var quantity = Math.round(current_pricepoint.payout_base_amount/unit);
+  if (quantity <= 0) quantity = 1;  
   
   FB.ui({
       method: 'pay',
@@ -559,7 +550,7 @@ function buyCoinsMobile(pricepointNumber) {
       pricepoint_id: current_pricepoint.pricepoint_id,
       quantity: quantity,
       quantity_min: 1,
-      quantity_max: 500
+      quantity_max: 1500
     },
     verifyPayment
   );
