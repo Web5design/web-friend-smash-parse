@@ -150,9 +150,9 @@ function initGame(challenge_fbid, challenge_name, initialBombs) {
 }
 
 function onClick(e) {
-  
+
   e = e || window.event;
-  
+
   var x;
   var y;
   if (e.pageX || e.pageY) {
@@ -244,7 +244,7 @@ function tick() {
   if (!gDoingGameover)
   {
     gSpawnTimer -= gTickSpeed;
-    
+
     if (gSpawnTimer < 0) {
       spawnEntity(false);
       gSpawnTimer = 2.8;
@@ -297,7 +297,7 @@ function tick() {
       gContext.fillRect (0, 0, gCanvasWidth, gCanvasHeight);
       gExplosionTimer--;
     }
-    
+
     gContext.globalCompositeOperation = "source-over";
   }
   else
@@ -406,7 +406,7 @@ function endGame() {
   gPlayerBombs -= gBombsUsed;  
   gPlayerCoins += gCoins;
 
-  updatePlayer();
+  updatePlayerUI();
   sendOG();
   sendScore();
   displayMenu(true);
@@ -461,7 +461,7 @@ function particle() {
   }
 
   this.draw = function() {
-    
+
     gContext.beginPath();
     
     //Time for some colors
@@ -479,7 +479,7 @@ function particle() {
 
 
 function entity() {
-  
+
   this.init = function(src, isFriend) {
     this.positionX = 0;
     this.positionY = 0;
@@ -495,7 +495,7 @@ function entity() {
   }
 
   this.spawn = function() {
-    
+
     var sideMargin = 40;
     this.positionX = getRandom(-sideMargin, gCanvasWidth + sideMargin);
     this.positionY = gCanvasHeight + 30;
@@ -503,7 +503,7 @@ function entity() {
     this.rotationalVelocity = getRandom(-2, 2);
 
     var distanceToMiddle = getRandom((gCanvasWidth/2)-150, (gCanvasWidth/2)+150) - this.positionX;
-    
+
     this.velocityX = distanceToMiddle * getRandom(0.019, 0.021);
     this.velocityY = getRandom(-12.5, -10);       
 
@@ -558,7 +558,7 @@ function entity() {
     if (this.scaleX < this.image.width * 30) {
       this.rotationAngle += this.rotationalVelocity;
       this.rotationalVelocity *= 1.05;
-      
+
       this.scaleX *= 1.05;
       this.scaleY *= 1.05;
 

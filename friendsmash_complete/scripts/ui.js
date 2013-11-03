@@ -154,6 +154,11 @@ function createMenu() {
   } 
 }
 
+function updatePlayerUI() {
+  $('.player_bombs').html(gPlayerBombs);
+  $('.player_coins').html(gPlayerCoins);
+}
+
 function welcomePlayer(uid) {
   console.log("Welcoming player");
   var welcomeMsgContainer = document.createElement('div');
