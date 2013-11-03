@@ -435,3 +435,53 @@ function processIncomingURL() {
       console.log(response);
     }
 
+function showPopUp(options) {
+  options       = options || {};
+  var img_src   = options.img || false;
+  var titleMsg  = options.title || "";
+  var callback  = options.callback || null; 
+  
+  var background = document.createElement('div');
+  background.id         = 'modal_background';
+  stage.appendChild(background);
+  
+  var container = document.createElement('div');
+  container.id      = 'pop_up';
+  stage.appendChild(container);
+  
+  var closeButton = document.createElement('div');
+  closeButton.id    = 'close_button';
+  closeButton.setAttribute('onclick', 'javascript:closePopUp('+callback+')');
+  stage.appendChild(closeButton);
+  
+  var header = document.createElement('div');
+  container.appendChild(header);
+  
+  if(img_src) {
+    var image = document.createElement('img');
+    image.setAttribute('src', 'images/'+img_src);
+    header.appendChild(image);
+  }
+  
+  var title = document.createElement('h1');
+  title.innerHTML  = titleMsg;
+  header.appendChild(title);
+  
+  var content = document.createElement('div');
+  content.style.position  = 'absolute';
+  content.style.top       = '75px';
+  content.style.width     = '100%';
+  container.appendChild(content);
+  
+  $(background).animate({'opacity': 1}, 'fast');
+  $(container).animate({'opacity': 1}, 'normal');
+  $(closeButton).animate({'opacity': 1}, 'normal');
+  
+  return content;
+}
+
+function closePopUp(callback) {
+  $('#modal_background').animate({'opacity': 0}, 'normal', function(){ $('#modal_background').remove(); if(callback) callback();});
+  $('#pop_up').animate({'opacity': 0}, 'fast', function(){ $('#pop_up').remove()});
+  $('#close_button').animate({'opacity': 0}, 'fast', function(){ $('#close_button').remove()} );
+}
