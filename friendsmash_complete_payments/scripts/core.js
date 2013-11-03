@@ -54,9 +54,14 @@ window.onload = function () {
   
 }
 
-
 function init() {
-  createMenu();
+  FB.getLoginStatus(function(response) {
+    if( response.authResponse ) {
+      createMenu();
+    } else {
+      FB.login(init, {scope:'publish_actions'});
+    }
+  });
 }
 
 function BlockMove(event) {
