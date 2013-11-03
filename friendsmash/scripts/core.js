@@ -52,4 +52,4 @@ window.addEventListener('load', function () {
 
 function init() {
   createMenu();
-  }
+}
