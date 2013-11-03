@@ -25,7 +25,7 @@ var g_api_url     = "https://immense-hamlet-8089.herokuapp.com";
 var g_init        = false;
 var stage;
 
-var appId = '1382373142002531';
+var appId = '1393332784218683';
 
 // Initialize the JS SDK
 FB.init({
