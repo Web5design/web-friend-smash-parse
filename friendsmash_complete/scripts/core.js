@@ -69,7 +69,7 @@ function init() {
     if( response.authResponse ) {
       createMenu();
     } else {
-      FB.login(init,'publish_actions');
+      FB.login(init, {scope:'publish_actions'});
     }
   });
 }
