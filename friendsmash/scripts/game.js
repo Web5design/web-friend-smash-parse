@@ -107,18 +107,18 @@ function initGame(challenge_fbid, challenge_name) {
   // Get our target player
   if (challenge_fbid == null)
   {
-      if (g_useFacebook) {
-      } else {
-          var nCelebToSpawn = Math.floor(getRandom(0, 10));
-          gFriendID = nCelebToSpawn;
-          var celebNames=["Einstein","Xzibit","Goldsmith","Sinatra","George","Jacko","Rick","Keanu","Arnie","Jean-Luc"];
-          gSmashUIText.innerHTML = "Smash " + celebNames[nCelebToSpawn] + " !"; 
-      }
+    if (g_useFacebook) {
+    } else {
+      var nCelebToSpawn = Math.floor(getRandom(0, 10));
+      gFriendID = nCelebToSpawn;
+      var celebNames=["Einstein","Xzibit","Goldsmith","Sinatra","George","Jacko","Rick","Keanu","Arnie","Jean-Luc"];
+      gSmashUIText.innerHTML = "Smash " + celebNames[nCelebToSpawn] + " !"; 
+    }
   }
   else
   {
-      gFriendID = challenge_fbid;
-      gSmashUIText.innerHTML = "Smash " + challenge_name + " !";
+    gFriendID = challenge_fbid;
+    gSmashUIText.innerHTML = "Smash " + challenge_name + " !";
   }
 
   gSpawnTimer = 0.7;
@@ -127,21 +127,21 @@ function initGame(challenge_fbid, challenge_name) {
 }
 
 function onClick(e) {
-    var x;
-    var y;
-    if (e.pageX || e.pageY) {
-      x = e.pageX;
-      y = e.pageY;
-    }
-    else {
-      x = e.clientX + document.body.scrollLeft +
-           document.documentElement.scrollLeft;
-      y = e.clientY + document.body.scrollTop +
-           document.documentElement.scrollTop;
-    }
+  var x;
+  var y;
+  if (e.pageX || e.pageY) {
+    x = e.pageX;
+    y = e.pageY;
+  }
+  else {
+    x = e.clientX + document.body.scrollLeft +
+    document.documentElement.scrollLeft;
+    y = e.clientY + document.body.scrollTop +
+    document.documentElement.scrollTop;
+  }
 
-    x -= gCanvasElement.parentNode.parentNode.offsetLeft;
-    y -= gCanvasElement.parentNode.parentNode.offsetTop;
+  x -= gCanvasElement.parentNode.parentNode.offsetLeft;
+  y -= gCanvasElement.parentNode.parentNode.offsetTop;
 
     // Did we click on an image?
     var clickScore = 0;
@@ -196,13 +196,13 @@ function onClick(e) {
       // Frenzy?
       if (!(gScore % 10))
       {
-          for (var i=0; i<Math.floor((gScore/20)); ++i) {
-            spawnEntity(true);
-          }
+        for (var i=0; i<Math.floor((gScore/20)); ++i) {
+          spawnEntity(true);
+        }
       }
       gScoreUIText.innerHTML = "Score: " + gScore;
     }
-}
+  }
 
 //Main game loop, which is executed on a fast loop so we can animate
 function tick() {
@@ -213,10 +213,10 @@ function tick() {
   if (!gDoingGameover)
   {
     gSpawnTimer -= gTickSpeed;
-                
+    
     if (gSpawnTimer < 0) {
-        spawnEntity(false);
-        gSpawnTimer = 2.8;
+      spawnEntity(false);
+      gSpawnTimer = 2.8;
     }
 
     for (var i=0; i<gEntities.length; i++) {
@@ -249,14 +249,14 @@ function tick() {
     // Particles      
     gContext.globalCompositeOperation = "lighter";
     for (var i=0; i<gExplosionParticles.length; i++) {
-        gExplosionParticles[i].tick();
-        gExplosionParticles[i].draw();
+      gExplosionParticles[i].tick();
+      gExplosionParticles[i].draw();
     }
     for (var i=0; i<gExplosionParticles.length; i++) {
-        if (gExplosionParticles[i].positionY > (gCanvasHeight + 10))
-        {
-          gExplosionParticles.remove(i);
-        }
+      if (gExplosionParticles[i].positionY > (gCanvasHeight + 10))
+      {
+        gExplosionParticles.remove(i);
+      }
     }
     gContext.globalCompositeOperation = "source-over";
   }
@@ -268,7 +268,7 @@ function tick() {
   }
 
 }
- 
+
 function spawnEntity(forceFriendsOnly) {
 
   var entityType = forceFriendsOnly ? 0 : getRandom(0, 1);
@@ -276,22 +276,22 @@ function spawnEntity(forceFriendsOnly) {
   var newEntity = new entity;
   
   if (entityType < 0.7 && gFriendID != null) {
-     if (g_useFacebook) {
-      newEntity.init("https://graph.facebook.com/" + gFriendID + "/picture?width=96&height=96", true);
-     } else {
-      newEntity.init('images/celebs/nonfriend_' + (gFriendID+1) + '.png', true);
-     }
+   if (g_useFacebook) {
+    newEntity.init("https://graph.facebook.com/" + gFriendID + "/picture?width=96&height=96", true);
+  } else {
+    newEntity.init('images/celebs/nonfriend_' + (gFriendID+1) + '.png', true);
   }
-  else {
-    var nCelebToSpawn = Math.floor(getRandom(0, 10));
-    while (nCelebToSpawn == gFriendID) {
-      nCelebToSpawn = Math.floor(getRandom(0, 10));
-    }
-    newEntity.init('images/celebs/nonfriend_' + (nCelebToSpawn+1) + '.png', false);       
+}
+else {
+  var nCelebToSpawn = Math.floor(getRandom(0, 10));
+  while (nCelebToSpawn == gFriendID) {
+    nCelebToSpawn = Math.floor(getRandom(0, 10));
   }
+  newEntity.init('images/celebs/nonfriend_' + (nCelebToSpawn+1) + '.png', false);       
+}
 
-  newEntity.spawn();
-  gEntities.push(newEntity);
+newEntity.spawn();
+gEntities.push(newEntity);
 
 }
 
@@ -394,7 +394,7 @@ function entity() {
     this.rotationalVelocity = getRandom(-2, 2);
 
     var distanceToMiddle = getRandom((gCanvasWidth/2)-150, (gCanvasWidth/2)+150) - this.positionX;
-      
+    
     this.velocityX = distanceToMiddle * getRandom(0.019, 0.021);
     this.velocityY = getRandom(-12.5, -10);       
 
@@ -449,7 +449,7 @@ function entity() {
     if (this.scaleX < this.image.width * 30) {
       this.rotationAngle += this.rotationalVelocity;
       this.rotationalVelocity *= 1.05;
-    
+      
       this.scaleX *= 1.05;
       this.scaleY *= 1.05;
 
@@ -471,4 +471,4 @@ function entity() {
 }
 
 
-  
+

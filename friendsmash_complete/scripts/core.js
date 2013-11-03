@@ -25,8 +25,18 @@ var g_api_url     = "https://immense-hamlet-8089.herokuapp.com";
 var g_init        = false;
 var stage;
 
+var appId = '1382373142002531';
+
+// Initialize the JS SDK
+FB.init({
+  appId: appId,
+  frictionlessRequests: true,
+  cookie: false,
+  status: false
+});
+
 window.onload = function () {
-  
+
   setTimeout(function () {
     gCanvasWidth = parseInt(stage.style.width);
     gCanvasHeight = parseInt(stage.style.height);
@@ -42,24 +52,24 @@ window.onload = function () {
   }, 500);
   
   setTimeout(function () {
-     init();
-   }, 1000)
+   init();
+ }, 1000)
   
   stage = document.getElementById('stage');
 
   // Set the dimensions to the match the client
   // This throws off game balance, but it's just a demo ;)
-  stage.style.width = '940px';
-  stage.style.height = '570px';
-  
-}
+stage.style.width = '940px';
+stage.style.height = '570px';
 
+}
 
 function init() {
-  createMenu();
-}
-
-function BlockMove(event) {
-  // Tell Safari not to move the window.
-  event.preventDefault() ;
+  FB.getLoginStatus(function(response) {
+    if( response.authResponse ) {
+      createMenu();
+    } else {
+      FB.login(init,'publish_actions');
+    }
+  });
 }
