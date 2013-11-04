@@ -70,6 +70,7 @@ stage.style.height = '570px';
 function init() {
   FB.getLoginStatus(function(response) {
     if( response.authResponse ) {
+      console.log('getLoginParamsFromAuthResponse', getLoginParamsFromAuthResponse(response.authResponse));
       Parse.FacebookUtils.logIn(
         getLoginParamsFromAuthResponse(response.authResponse)
       ).then(loginSuccessCallback, loginErrorCallback);
