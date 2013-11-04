@@ -23,6 +23,8 @@
 var gPlayerFBID;
 var gPlayerBombs = 0;
 var gPlayerCoins = 0;
+var gInitialBombs = 5;
+var gInitialCoins = 100;
 var gTournamentCountdown;
 
 kAchievements = {
@@ -73,7 +75,7 @@ function createMenu() {
     function() {
       $(this).stop().animate({"opacity": "1"}, "slow");
     }
-    );
+  );
 
   if (g_useFacebook) {
     /* Brag Button */
@@ -102,8 +104,7 @@ function createMenu() {
       function() {
         $(this).stop().animate({"opacity": "1"}, "slow");
       }
-      );
-
+    );
 
     /* Challenge Button */
     var challengeButton = document.createElement('div');
@@ -181,8 +182,8 @@ function welcomePlayer(uid) {
       welcomeMsgContainer.appendChild(profileImage);
     });
 
-    gPlayerBombs = 5;
-    gPlayerCoins = 100;
+    gPlayerBombs = gInitialBombs;
+    gPlayerCoins = gInitialCoins;
 
     $('.player_bombs').html(gPlayerBombs);
     $('.player_coins').html(gPlayerCoins);
