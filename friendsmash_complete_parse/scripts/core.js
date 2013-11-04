@@ -27,13 +27,16 @@ var stage;
 
 var appId = '1393332784218683';
 
-// Initialize the JS SDK
+// Initialize the Facebook JS SDK
 FB.init({
   appId: appId,
   frictionlessRequests: true,
   cookie: false,
   status: false
 });
+
+// Initialize the Parse SDK
+Parse.initialize("N1lOGVWXpikgvPFJxkfkd4kRTvaPNuOWe83zRoRx", "uXn3ZPeUMZsCF1bJTUwkATTWX2jRYDxWzqyDznxp");
 
 window.onload = function () {
 
@@ -67,9 +70,50 @@ stage.style.height = '570px';
 function init() {
   FB.getLoginStatus(function(response) {
     if( response.authResponse ) {
-      createMenu();
+      Parse.FacebookUtils.logIn(
+        getLoginParamsFromAuthResponse(response.authResponse)
+      ).then(loginSuccessCallback, loginErrorCallback);
     } else {
       FB.login(init, {scope:'publish_actions'});
     }
   });
+}
+
+function updatePlayer() {
+  Parse.User.current().save({
+    bombs: gPlayerBombs,
+    coins: gPlayerCoins
+  }).then( updatePlayerUI, parseErrorCallback );
+}
+
+function getLoginParamsFromAuthResponse(authResponse) {
+  return {
+    uid: authResponse.userID,
+    access_token: authResponse.accessToken,
+    expiration_date: convertExpiryDate(authResponse.expiresIn)
+  };
+}
+
+function convertExpiryDate(expiry) {
+  return '2020-01-01T12:00:00.000Z'; // Stub for now!
+}
+
+function loginSuccessCallback(user) {
+  console.log('Successful login', user);
+  if( !user.existed() ) {
+    setupNewParseUser();
+  } else {
+    createMenu();
+  }
+}
+
+function loginErrorCallback(error) {
+  console.error('Login error', error);
+}
+
+function setupNewParseUser() {
+  Parse.User.current().save({
+    bombs: gInitialBombs,
+    coins: gInitialCoins
+  }).then( createMenu, parseErrorCallback );
 }
