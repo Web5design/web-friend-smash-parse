@@ -1,0 +1,186 @@
+## Introduction
+
+If you've followed the [other steps](/docs/games/canvas-games/) in the tutorial, you now have a working game that uses multiple social channels to allow players to share their progress. At this point however, the player's progress is lost when they leave the game, and their bombs and coins balance is reset each time the return. Additionally, this progress is not maintained if a user goes on to play the iOS or Android versions of the game, even if they use their Facebook login credentials to do so. 
+
+To support persistence of game progress between sessions, you need a back-end data service. You can choose to build this yourself, or you can choose to use a backend-as-a-service, which takes away a lot of the complexity of data storage. Selecting the right backend for your game is an important step in the development cycle. 
+
+In this tutorial, we'll use the back-end service [Parse](https://parse.com) to create and maintain a consistent *User* object and store the number of *bombs* and *coins* they have, so that it can be retrieved and updated in each of the client versions of the game. Parse offers a number of services for developers, including Parse Analytics, Cloud Code, Parse Hosting, Parse Push, but this tutorial focuses specifically on Parse Data.
+
+This tutorial comprises the following steps:
+
+1. [Parse App Setup](#appsetup)
+2. [Adding the Parse SDK to the game](#addparsesdk)
+3. [Getting a Parse User from a Facebook User ID](#parseuserauth)
+4. [Fetching data about a Parse User](#fetchingdata)
+5. [Saving data to Parse](#savingdata)
+6. [Using the Parse data browser](#databrowser)
+
+This tutorial will focus on adding Parse-backed data to the Canvas version of Friend Smash; similar tutorials exist for the iOS and Android versions of the game.
+
+* [Data Persistence with Parse on iOS](/404)
+* [Data Persistence with Parse on Android](/404)
+
+### Data Model
+
+In Parse, all objects extend a base `Parse.Object` class. Classes extending `Parse.Object` are unique to each app, and instances of those classes belong to that app alone. Since Parse is schemaless, it’s possible to add any additional properties to an instance or a sub-class of `Parse.Object`, as required by the data model for the app.
+Parse has a special class, `Parse.User`, which is used for login and storing information on a per-user basis. Just like with Objects, it’s possible to arbitrarily add properties to User instances. We’ll use this ability in this sample app, by storing the bombs and coins balance for a player as properties of a `Parse.User` object.
+
+### Authentication
+
+In [Step 1](/docs/games/canvas-games/authenticate/) of this tutorial, you learned how to authenticate with your app via [Facebook Login](/docs/facebook-login/). We’ll extend on that functionality for this tutorial, by using Facebook Login and Parse Login together to authenticate a user and retrieve or create their User info with Parse. 
+Parse has a convenience method for linking a Facebook user to a Parse User, and by using this we’ll have both a Facebook user (for sharing and API access), and a Parse User (for data persistence), authenticated on the client-side. With this approach, there’s no need to handle a signed-request on your server.
+
+### Hosting
+
+Parse has a simple solution for hosting static web content, such as the HTML and graphic assets for this sample game, called [Parse Hosting](https://parse.com/products/hosting). While this works well for serving static content via `HTTP GET`, Facebook Canvas currently requires that the main game HTML page is served via a `HTTP POST`, so it’s not possible to use Parse Hosting to serve the HTML. 
+
+Parse has a hosting solution that supports `HTTP POST`, called [Cloud Code](https://parse.com/products/cloud_code), but this is beyond the scope of this tutorial. In the meantime, you can continue to use the static hosting you used for the previous steps in this tutorial.
+
+Read the Parse documentation on [Dynamic Websites](https://parse.com/docs/cloud_code_guide#webapp) to learn more about Parse Hosting and building dynamic websites on Cloud Code.
+
+---
+
+## Step 1. Parse App Setup {#appsetup}
+
+To begin saving data to Parse, you'll first need to create a Parse account and an app. Go to [www.parse.com](http://www.parse.com) and follow the steps to create an account and an app. 
+
+Once your Parse app is created, you’ll be given a set of keys to use with the SDKs. You’ll use this later in the tutorial, so remember where these can be found.
+
+Before you can use Parse for login, you’ll need to add the Facebook App ID to your Parse app settings. This step is necessary to enable linking a user’s Facebook account and the Parse account that will be created for them when they log in.
+
+## Step 2. Add Parse SDK to game {#addparsesdk}
+
+Add the Parse SDK to your game’s HTML file. You can take a local copy of the Parse SDK, or use the version on Parse’s or a 3rd Party CDN.
+
+~~~
+<script src="http://www.parsecdn.com/js/parse-1.2.12.min.js"></script>
+~~~
+
+In your initialization code, right after you initialize the Facebook SDK, initialize the Parse SDK using the Application ID and Client Key generated for you in the app creation step above.
+
+~~~
+Parse.initialize("ILQ...YDj", "ylE...KhC");
+~~~
+
+## Get a Parse user from a Facebook user {#parseuserauth}
+
+Now that both SDKs are loaded and initialized, it’s time to get an authenticated Parse User. 
+
+The Parse SDK offers several ways to get or create a Parse User. Since this is a Canvas game, we’ll always have a Facebook User ID for identifying a Parse User, so we’ll use the `Parse.FacebookUtils.logIn` method, which takes a Facebook User ID and an access token and returns a Parse User. This method will look for an existing Parse User linked to the Facebook User ID, and will create a new User if one isn’t found. 
+
+In the `FB.getLoginStatus` callback, call `Parse.FacebookUtils.logIn` using uid, access_token and expiration_date from the `authResponse` you got from `FB.getLoginStatus`.
+
+~~~
+...
+Parse.FacebookUtils.logIn({
+  id : uid,
+  access_token : access_token,
+  expiration_date : expiration_date
+}).then(loginSuccessCallback, loginErrorCallback);
+...
+~~~
+
+Parse has a specific format for expiration_date, so this will need to be converted from the expiry date in the authResponse.
+
+~~~
+function convertExpiryDate(expiry) {
+  return '2020-01-01T12:00:00.000Z'; // Stub for now!
+}
+~~~
+
+`Parse.FacebookUtils.logIn` uses Promises to handle callbacks on async methods. Define a success callback and an error callback that will be called when the login completes. These will be stub methods for now.
+
+~~~
+function loginSuccessCallback(user) {
+  console.log('Successful login', user);
+  createMenu();
+}
+function loginErrorCallback(error) {
+  console.error('Login error', error);
+}
+~~~
+
+Now, when a Facebook user logs in, Parse will use their credentials to retrieve the linked Parse User account. If a user logs in for the first time, a new Parse user will be created and linked to the Facebook account.
+
+## Step 4. Fetching data about a Parse user {#fetchingdata}
+
+With a Facebook user logged in and attached to a Parse user, you can reference the Parse User on the client using the convenience method `Parse.User.current()`. This method will return the User found during the authentication step above, and the data for this user will reflect the state of the object on the Parse server at the time of authentication.
+
+We’ll use the information from this user to populate the UI elements for bombs and coins, so replace the default value assignment with the values retrieved from the current user.
+
+~~~
+gPlayerBombs = Parse.User.current().get('bombs');
+gPlayerCoins = Parse.User.current().get('coins');
+
+updatePlayerUI();
+
+...
+
+function updatePlayerUI() {
+  $('.player_bombs').html(gPlayerBombs);
+  $('.player_coins').html(gPlayerCoins);
+}
+
+~~~
+
+## Step 5. Saving data to Parse {#savingdata}
+
+After the authentication step, the current Parse User is a client-side copy of the data on the Parse server. This means you can change the properties of the current user as the game is being played, but those changes will need to be manually saved to the server in order to persist them.
+
+To save changes made to the User object, use the `Parse.User.save` method. This method will persist all changes made to the local User object to the Parse server. Alternatively, it can be passed an array of keys and values to update directly and save. We’ll use this to update the bombs and coins based on the outcome of a game round.
+
+The save happens asynchronously, so it’s necessary to define a callback. We’ll use this to update the UI when a User’s coins and bombs are saved.
+
+~~~
+function updatePlayer() {
+  Parse.User.current().save({
+    bombs: gPlayerBombs,
+    coins: gPlayerCoins
+  }).then( updatePlayerUI, parseErrorCallback );
+}
+~~~
+
+If a user has logged in to this app for the first time, the bombs / coins fields will not be set, since we’re only saving them when the game ends, so `get(‘coins’)` and `get(‘bombs’)` will be undefined.
+
+We need to add an additional step to the login flow, to detect that a user is new, and to set an initial balance for the user’s coins and bombs. We do that by checking if the user is new, and branching to a save method to set these initial values before launching the menu UI. Parse has a convenience method, `Parse.User.existed()`, for checking if the current user was previously in the system, or if they were created as part of the authentication step.
+
+~~~
+...
+if( !user.existed() ) {
+  setupNewParseUser();
+}
+...
+
+function setupNewParseUser() {
+  Parse.User.current().save({
+    bombs: 5,
+    coins: 100
+  }).then( parseCallback, parseErrorCallback );
+}
+~~~
+
+With this code in place, play a game, and see that your coins and bombs are being updated. Now refresh the app, and you’ll see that, unlike before, your bombs and coins balance remain as they were from the previous session, instead of being reset each time the game is launched.
+
+## Step 6. Using the Parse data browser {#databrowser}
+
+Once you have tested the login flow works as expected, and that your user’s bombs and coins are being saved correctly between sessions, open up the Parse Data Browser. You’ll see a list of object types, and you’ll see one or more User objects listed. Look for the user created when you logged in. 
+
+You can directly edit objects in the data browser, and these will be updated immediately. The local instances of these objects will be updated next time they’re fetched from the server. Test this by overriding the number of bombs for your user object, then reload the game and see that the updated value is reflected in the UI within the game.
+
+---
+
+## Security considerations with client-side data
+
+### Protecting against client-side manipulation
+
+As with any client-side code, games using JavaScript objects to store state are vulnerable to manipulation by players. Using the JavaScript console, it’s easy for a player to grant themselves more coins or bombs by calling `Parse.User.current().save` directly, with whatever values they want.
+
+Protecting your game against client-side manipulation is beyond the scope of this tutorial, but you should consider this when designing the persistence logic for your game. You may want to pass additional information about the game state when saving the inventory for a given player, and verify the update against the game state to ensure it’s valid. 
+
+It’s possible to use [Cloud Code](https://parse.com/products/cloud_code) to perform additional server-side logic when a User object is being updated, to verify that the update was valid. Take a look at the [`beforeSave`](https://parse.com/docs/cloud_code_guide#functions-onsave) and [`afterSave`](https://parse.com/docs/cloud_code_guide#functions-aftersave) events to trigger server-side verification logic upon client object saves.
+
+### Using Access Control to increase game security
+
+Parse’s default security model is to allow any object to be updated by any client using a valid Application ID and Client Key. To add more control over data access, you can use Parse’s [Access Control Lists](https://parse.com/docs/js_guide#users-acls) (ACL). By using ACLs, it’s possible to (for example) allow all players read access to a user’s coin balance, but only allow that user to have write access to make updates. 
+
+Using ACLs in combination with Cloud Code for verification makes it possible to prevent users from updating their balance directly, by only granting write access to Cloud Code functions. In this approach, you would send game state information to Cloud Code on completion of a game, and the coins and bombs balances would be calculated from this information instead of updated directly.

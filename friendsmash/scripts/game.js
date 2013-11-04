@@ -34,7 +34,6 @@ var gGameOverEntity;
 var gTickGameInterval;
 var gLifeImages = Array();
 var gLives;
-var gInitialLives;
 var gExplosionParticles = Array();
 
 var TO_RADIANS = Math.PI/180; 
@@ -91,10 +90,9 @@ function initGame(challenge_fbid, challenge_name) {
   }
   gSmashUIText.innerHTML = "";
 
-  gInitialLives = 3;
-  gLives = gInitialLives;
+  gLives = 3;
 
-  for (var i=0; i<gInitialLives; ++i) {
+  for (var i=0; i<gLives; ++i) {
     var lifeID = 'ingame_life' + i;
     if (!document.getElementById(lifeID)) { 
       gLifeImages[i] = document.createElement('div');

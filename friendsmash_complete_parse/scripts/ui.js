@@ -73,7 +73,7 @@ function createMenu() {
     function() {
       $(this).stop().animate({"opacity": "1"}, "slow");
     }
-    );
+  );
 
   if (g_useFacebook) {
     /* Brag Button */
