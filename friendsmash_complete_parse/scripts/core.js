@@ -89,7 +89,7 @@ function updatePlayer() {
 
 function getLoginParamsFromAuthResponse(authResponse) {
   return {
-    uid: authResponse.userID,
+    id: authResponse.userID,
     access_token: authResponse.accessToken,
     expiration_date: convertExpiryDate(authResponse.expiresIn)
   };
