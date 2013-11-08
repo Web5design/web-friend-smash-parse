@@ -36,7 +36,7 @@ FB.init({
 });
 
 // Initialize the Parse SDK
-Parse.initialize("N1lOGVWXpikgvPFJxkfkd4kRTvaPNuOWe83zRoRx", "nwIChKspaBSV0dFwQlKinrVD3XFXIRScCZiE1lIi");
+Parse.initialize("ILQ3MtsLG2uv7ZHFMm7ZHoE8BIAKwA1SySejgYDj", "ylEv4PMhC45mXfgZXYuCM2VIPgqZg8RwlPBAjKhC");
 
 window.onload = function () {
 
