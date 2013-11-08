@@ -113,7 +113,16 @@ function loginErrorCallback(error) {
   console.error('Login error', error);
 }
 
+function parseSuccessCallback(object) {
+  console.log('Parse Success:', object);
+}
+
+function parseErrorCallback(error) {
+  console.error('Parse Error:', error);
+}
+
 function setupNewParseUser() {
+  console.log('Saving new user')''
   Parse.User.current().save({
     bombs: gInitialBombs,
     coins: gInitialCoins
