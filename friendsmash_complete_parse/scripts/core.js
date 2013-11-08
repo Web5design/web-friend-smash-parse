@@ -122,7 +122,6 @@ function parseErrorCallback(error) {
 }
 
 function setupNewParseUser() {
-  console.log('Saving new user')''
   Parse.User.current().save({
     bombs: gInitialBombs,
     coins: gInitialCoins
