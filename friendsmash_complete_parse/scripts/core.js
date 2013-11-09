@@ -96,8 +96,17 @@ function getLoginParamsFromAuthResponse(authResponse) {
   };
 }
 
-function convertExpiryDate(expiry) {
-  return '2020-01-01T12:00:00.000Z'; // Stub for now!
+function convertExpiryDate(expiresIn) {
+  var date = new Date();
+  date.setSeconds(date.getSeconds() + expiresIn);
+  return ''
+    + date.getUTCFullYear() + '-'
+    + ('0' + (date.getMonth()+1)).slice(-2) + '-'
+    + ('0' + date.getDay()).slice(-2) + 'T'
+    + ('0' + date.getHours()).slice(-2) + ':'
+    + ('0' + date.getMinutes()).slice(-2) + ':'
+    + ('0' + date.getSeconds()).slice(-2) + '.'
+    + ('00' + date.getMilliseconds()).slice(-3) + 'Z';
 }
 
 function loginSuccessCallback(user) {
